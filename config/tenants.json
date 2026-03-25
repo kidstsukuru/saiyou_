@@ -3,7 +3,8 @@
     "name": "琉球大学大森部屋",
     "gasUrl": "https://script.google.com/macros/s/AKfycbyMe_rqh6AmcWyrpLdhSm-rBGRyFFhWH31cAbRKnavNAzE39-6-vxFL1IXWFP8ZYZ4UjA/exec",
     "allowedOrigins": [
-      "http://localhost:3000"
+      "http://localhost:3000",
+      "https://saiyou-lac.vercel.app"
     ],
     "blockedTopics": [
       "具体的な給与額",

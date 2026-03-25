@@ -65,7 +65,7 @@ export default function LandingPage() {
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
           }}>
             <iframe
-              src="/chat/demo"
+              src="/chat/ryukyu"
               style={{ width: '100%', height: '100%', border: 'none' }}
               title="チャットボットデモ"
             />
