@@ -1,6 +1,6 @@
 {
-  "demo": {
-    "name": "デモ企業株式会社",
+  "ryukyu": {
+    "name": "琉球大学大森部屋",
     "gasUrl": "https://script.google.com/macros/s/AKfycbyMe_rqh6AmcWyrpLdhSm-rBGRyFFhWH31cAbRKnavNAzE39-6-vxFL1IXWFP8ZYZ4UjA/exec",
     "allowedOrigins": [
       "http://localhost:3000"
