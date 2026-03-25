@@ -1,0 +1,470 @@
+/* ========================================
+   採用チャットボット UI
+   情報設計優先・最小限装飾・実運用耐性
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&display=swap');
+
+/* ========== カラーシステム ==========
+   各色に1つの役割だけを持たせる
+
+   ブランド色: teal → ヘッダー、アシスタント名
+   操作色:     blue → 送信ボタン、リンク
+   ユーザー色:  slate-dark → ユーザー吹き出し
+   状態色:     gray → 非活性・補助テキスト
+   注意色:     amber → 文字数警告
+   エラー色:    red → エラー表示
+   成功色:     green → オンライン表示
+   ======================================== */
+
+:root {
+  /* ブランド */
+  --brand: #0d9488;
+  --brand-light: #f0fdfa;
+
+  /* 操作 */
+  --action: #2563eb;
+  --action-hover: #1d4ed8;
+
+  /* ユーザー吹き出し */
+  --user-bg: #1e293b;
+  --user-text: #ffffff;
+
+  /* アシスタント吹き出し */
+  --assist-bg: #ffffff;
+  --assist-text: #1e293b;
+  --assist-border: #e2e8f0;
+
+  /* 背景 */
+  --bg-page: #f8fafc;
+  --bg-header: #ffffff;
+  --bg-input: #ffffff;
+  --bg-chat: #f1f5f9;
+
+  /* テキスト */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-on-dark: #ffffff;
+
+  /* 状態色（それぞれ1つの意味だけ） */
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  /* ボーダー・影 */
+  --border: #e2e8f0;
+  --border-focus: #2563eb;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ========== Chat Container ========== */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg-chat);
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== Header ==========
+   最小限の情報：名前とオンライン状態のみ
+   ========== */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.chat-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--text-on-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+
+.chat-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-header-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.chat-header-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.3;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
+
+/* ========== Messages Area ==========
+   会話コンテンツが主役。背景は控えめに。
+   ========== */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overscroll-behavior: contain;
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+/* ========== Message Bubbles ==========
+   ユーザー: 暗色で右寄せ → 自分の発言と即座に分かる
+   アシスタント: 白で左寄せ → 長文が読みやすい
+   ========== */
+.message-wrapper {
+  display: flex;
+  gap: 8px;
+  max-width: 80%;
+  animation: msgIn 0.2s ease-out;
+}
+
+.message-wrapper.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-wrapper.assistant {
+  align-self: flex-start;
+}
+
+@keyframes msgIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* 長文の折り返しを保証 */
+}
+
+.message-bubble {
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.message-wrapper.user .message-bubble {
+  background: var(--user-bg);
+  color: var(--user-text);
+  border-radius: var(--radius) var(--radius) 4px var(--radius);
+}
+
+.message-wrapper.assistant .message-bubble {
+  background: var(--assist-bg);
+  color: var(--assist-text);
+  border: 1px solid var(--assist-border);
+  border-radius: var(--radius) var(--radius) var(--radius) 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.message-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
+.message-wrapper.user .message-time {
+  text-align: right;
+}
+
+/* ========== Typing Indicator ==========
+   控えめに、3つのドットだけ
+   ========== */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px;
+  background: var(--assist-bg);
+  border: 1px solid var(--assist-border);
+  border-radius: var(--radius) var(--radius) var(--radius) 4px;
+  width: fit-content;
+  box-shadow: var(--shadow-sm);
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: typePulse 1.2s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typePulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ========== Welcome ==========
+   最初に見える → 何ができるか即座に伝える
+   装飾を削ぎ落とし、テキストとアクションだけ
+   ========== */
+.welcome-message {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 8px 8px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  background: var(--assist-bg);
+  border: 1px solid var(--assist-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.welcome-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+.suggested-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.suggested-btn {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-header);
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.suggested-btn:hover {
+  background: var(--brand-light);
+  border-color: var(--brand);
+}
+
+.suggested-btn:active {
+  transform: scale(0.99);
+}
+
+/* ========== Input Area ==========
+   行動（質問する）に集中させる。
+   入力欄が主役、補助要素は控えめに。
+   ========== */
+.chat-input-area {
+  padding: 10px 12px 12px;
+  background: var(--bg-header);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 8px 6px 14px;
+  transition: border-color 0.15s;
+}
+
+.chat-input-wrapper:focus-within {
+  border-color: var(--border-focus);
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  min-height: 22px;
+  max-height: 88px;
+  line-height: 1.5;
+  padding: 4px 0;
+}
+
+.chat-input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.char-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-bottom: 6px;
+  min-width: 40px;
+  text-align: right;
+  transition: color 0.15s;
+}
+
+.char-count.warning {
+  color: var(--warning);
+}
+
+.char-count.error {
+  color: var(--error);
+  font-weight: 500;
+}
+
+.send-button {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--action);
+  color: var(--text-on-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  font-size: 16px;
+}
+
+.send-button:hover:not(:disabled) {
+  background: var(--action-hover);
+}
+
+.send-button:disabled {
+  background: var(--text-muted);
+  cursor: default;
+}
+
+.send-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* ========== Privacy Notice ==========
+   必要だが目立たせない
+   ========== */
+.privacy-notice {
+  text-align: center;
+  padding: 4px 12px;
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ========== Error ==========
+   エラー色は赤のみ。インラインで表示。
+   ========== */
+.error-toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--error);
+  color: var(--text-on-dark);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  animation: toastIn 0.2s ease-out, toastOut 0.2s ease-in 2.8s forwards;
+  z-index: 100;
+  max-width: calc(100% - 32px);
+  text-align: center;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translate(-50%, 8px); }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 480px) {
+  .chat-messages { padding: 12px; }
+  .message-wrapper { max-width: 88%; }
+}

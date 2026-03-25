@@ -1,0 +1,17 @@
+{
+  "demo": {
+    "name": "デモ企業株式会社",
+    "gasUrl": "https://script.google.com/macros/s/AKfycbyMe_rqh6AmcWyrpLdhSm-rBGRyFFhWH31cAbRKnavNAzE39-6-vxFL1IXWFP8ZYZ4UjA/exec",
+    "allowedOrigins": [
+      "http://localhost:3000"
+    ],
+    "blockedTopics": [
+      "具体的な給与額",
+      "特定の社員に関する質問"
+    ],
+    "customRules": [
+      "給与の具体的な金額については回答せず、採用担当への問い合わせを促す",
+      "競合他社との比較質問には回答しない"
+    ]
+  }
+}
